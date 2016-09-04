@@ -1,0 +1,14 @@
+{
+    "name": "niisan/gomoku",
+    "license": "MIT",
+    "require": {
+        "cboden/ratchet": "^0.3.5",
+        "niisan-tokyo/phpnn": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Niisan\\Gomoku\\": "src/",
+            "Niisan\\phpml\\": "src/libs/learn"
+        }
+    }
+}
