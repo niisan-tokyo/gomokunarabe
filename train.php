@@ -16,7 +16,7 @@ $wdir = __DIR__ . '/dest/white';
 $bdir = __DIR__ . '/dest/black';
 $white->init($dimm2 + 1, $dimm2);
 $black->init($dimm2 + 1, $dimm2);
-for ($i = 1; $i < 20000; $i++) {
+for ($i = 1; $i < 300000; $i++) {
     $state = $field->getState(true);
     $actions = $field->getProb();
     if ($field->getTurn() === 1) {
@@ -41,15 +41,15 @@ for ($i = 1; $i < 20000; $i++) {
         if ($winner == 1) {
             $white->setReward(2);
             $black->setReward(-2);
-            echo "白の勝ち\n";
+            //echo "白の勝ち\n";
         } elseif ($winner == -1) {
             $white->setReward(-2);
             $black->setReward(2);
-            echo "黒の勝ち\n";
+            //echo "黒の勝ち\n";
         } else {
             $white->setReward(1);
             $black->setReward(1);
-            echo "引き分け\n";
+            //echo "引き分け\n";
         }
 
         //show($field, $dimmension);

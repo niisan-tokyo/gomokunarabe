@@ -4,6 +4,7 @@ namespace Niisan\Gomoku\libs;
 
 use Niisan\phpnn\layer\Relu;
 use Niisan\phpnn\layer\Linear;
+use Niisan\phpnn\layer\HyperbolicTangent;
 
 class Agent
 {
@@ -24,11 +25,14 @@ class Agent
     private $action;
 
     // e-greedy
-    private $max_epsilon = 10000;
-    private $min_epsilon = 5000;
+    private $max_epsilon = 100000;
+    private $min_epsilon = 10000;
     private $epock = 0;
-    private $epock_line = 1000;
+    private $epock_line = 10000;
     private $epsilon;
+
+    // 報酬付与数
+    private $reward_count = 1;
 
     public function init($input_dim, $output_dim)
     {
@@ -36,11 +40,19 @@ class Agent
         $this->layer_dim[$this->layer_count] = $output_dim;
         for ($i = 1; $i < $this->layer_count; $i++) {
             $obj = new Relu();
-            $obj->init($this->layer_dim[$i - 1], $this->layer_dim[$i]);
+            $obj->init(
+                $this->layer_dim[$i - 1],
+                $this->layer_dim[$i],
+                ['history_count' => $this->action_count, 'effect' => 0.01]
+            );
             $this->layer[$i] = $obj;
         }
-        $obj = new Linear();
-        $obj->init($this->layer_dim[$this->layer_count - 1], $this->layer_dim[$this->layer_count]);
+        $obj = new HyperbolicTangent();
+        $obj->init(
+            $this->layer_dim[$this->layer_count - 1],
+            $this->layer_dim[$this->layer_count],
+            ['history_count' => $this->action_count, 'effect' => 0.01, 'max' => 2]
+        );
         $this->layer[$this->layer_count] = $obj;
         $this->epsilon = $this->max_epsilon + 1;
     }
@@ -116,7 +128,7 @@ class Agent
         $action = $this->action[$action_count - 1];
         $value = $this->value_function[$action];
         //echo "$value \n";
-        if (mt_rand(1, 100) == 1) {
+        if ($this->reward_count % 50 == 0) {
             $loss = ($value - $reward) * ($value - $reward) / 2;
             echo "loss: $loss \n";
         }
@@ -133,6 +145,7 @@ class Agent
             $loss_diff_val = $this->pass_effect * $loss_diff_val;
             $loss_diff[$action] = $loss_diff_val;
         }
+        $this->reward_count++;
     }
 
     public function reset()
