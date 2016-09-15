@@ -4,19 +4,19 @@ require('vendor/autoload.php');
 
 use Niisan\Gomoku\libs\Field;
 
-$dimmension = 7;
+$dimension = 7;
 
-$field = new Field($dimmension);
+$field = new Field($dimension);
 
 $white = new Niisan\Gomoku\libs\Agent();
 $black = new Niisan\Gomoku\libs\Agent();
 
-$dimm2 = $dimmension * $dimmension;
+$dimm2 = $dimension * $dimension;
 $wdir = __DIR__ . '/dest/white';
 $bdir = __DIR__ . '/dest/black';
 $white->init($dimm2 + 1, $dimm2);
 $black->init($dimm2 + 1, $dimm2);
-for ($i = 1; $i < 300000; $i++) {
+for ($i = 1; $i < 500000; $i++) {
     $state = $field->getState(true);
     $actions = $field->getProb();
     if ($field->getTurn() === 1) {
@@ -48,11 +48,11 @@ for ($i = 1; $i < 300000; $i++) {
             //echo "黒の勝ち\n";
         } else {
             $white->setReward(1);
-            $black->setReward(1);
+            $black->setReward(1.3);
             //echo "引き分け\n";
         }
 
-        //show($field, $dimmension);
+        //show($field, $dimension);
         //sleep(1);
         $white->reset();
         $black->reset();
@@ -71,8 +71,8 @@ for ($i = 1; $i < 300000; $i++) {
     }
 }
 
-$white->saveModel($wdir, $dimmension);
-$black->saveModel($bdir, $dimmension);
+$white->saveModel($wdir, $dimension);
+$black->saveModel($bdir, $dimension);
 
 
 function show($game, $dim)

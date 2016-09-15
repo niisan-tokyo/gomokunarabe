@@ -24,31 +24,28 @@ $white->loadModel($wdir, $dimension);
 $black->loadModel($bdir, $dimension);
 
 $display->show($field);
+$your_turn = 1;
+$obj = ($your_turn === 1) ? $black: $white;
 while(1) {
     $state = $field->getState(true);
     $actions = $field->getProb();
-    if ($field->getTurn() === 1) {
-        $obj = $white;
+    if ($field->getTurn() === $your_turn) {
+        list($x, $y) = explode(' ', fgets(STDIN,4096));
+        if (! $field->putStone($x, $y)) {
+            echo $firld->message . "\n";
+        }
     } else {
-        $obj = $black;
+        $obj->input($state);
+        $action = $obj->getAction($actions);
+        $field->agentPut($action);
     }
 
-    $obj->input($state);
-    $action = $obj->getAction($actions);
-    $field->agentPut($action);
-
     $display->show($field);
-    sleep(1);
-
     if ($field->isEnd()) {
-        $winner = $field->getWinner();
-        if ($winner == 1) {
-            echo "白の勝ち\n";
-        } elseif ($winner == -1) {
-            echo "黒の勝ち\n";
-        } else {
-            echo "引き分け\n";
-        }
-        break;
+        echo $field->getWinner . "の勝利!!\n";
+        $field->initialize();
+        echo "エンターを押してください\n";
+        fgets(STDIN,4096);
+        $display->show($field);
     }
 }

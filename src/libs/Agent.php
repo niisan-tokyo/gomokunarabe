@@ -13,20 +13,21 @@ class Agent
     private $output_dim;
     private $layer = [];
     private $layer_dim = [
-        1 => 64,
+        1 => 32,
         2 => 64,
-        3 => 64
+        3 => 128,
+        4 => 64
     ];
-    private $layer_count = 3;
-    private $action_count = 10;
+    private $layer_count = 4;
+    private $action_count = 5;
     private $pass_effect  = 0.9;
 
     private $value_function;
     private $action;
 
     // e-greedy
-    private $max_epsilon = 100000;
-    private $min_epsilon = 10000;
+    private $max_epsilon = 200000;
+    private $min_epsilon = 20000;
     private $epock = 0;
     private $epock_line = 10000;
     private $epsilon;
