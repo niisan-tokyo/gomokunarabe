@@ -16,7 +16,7 @@ $wdir = __DIR__ . '/dest/white';
 $bdir = __DIR__ . '/dest/black';
 $white->init($dimm2 + 1, $dimm2);
 $black->init($dimm2 + 1, $dimm2);
-for ($i = 1; $i < 300000; $i++) {
+for ($i = 1; $i < 500000; $i++) {
     $state = $field->getState(true);
     $actions = $field->getProb();
     if ($field->getTurn() === 1) {
@@ -25,8 +25,7 @@ for ($i = 1; $i < 300000; $i++) {
         $obj = $black;
     }
 
-    $obj->input($state);
-    $action = $obj->train($actions);
+    $action = $obj->train($state, $actions);
     $field->agentPut($action);
     if (!empty($field->message)) {
         print_r($field->message);
@@ -48,7 +47,7 @@ for ($i = 1; $i < 300000; $i++) {
             //echo "黒の勝ち\n";
         } else {
             $white->setReward(1);
-            $black->setReward(1);
+            $black->setReward(1.5);
             //echo "引き分け\n";
         }
 
