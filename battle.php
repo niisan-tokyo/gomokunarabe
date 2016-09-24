@@ -33,8 +33,7 @@ while(1) {
         $obj = $black;
     }
 
-    $obj->input($state);
-    $action = $obj->getAction($actions);
+    $action = $obj->getAction($state, $actions);
     $field->agentPut($action);
 
     $display->show($field);

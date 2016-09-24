@@ -309,12 +309,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/niisan-tokyo/phpnn.git",
-                "reference": "1732b8b14b7ed86a591dbd24f8933944685bebb9"
+                "reference": "3e3f2640776853abc1ab54cac3f214d6f2dabd67"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/niisan-tokyo/phpnn/zipball/1732b8b14b7ed86a591dbd24f8933944685bebb9",
-                "reference": "1732b8b14b7ed86a591dbd24f8933944685bebb9",
+                "url": "https://api.github.com/repos/niisan-tokyo/phpnn/zipball/3e3f2640776853abc1ab54cac3f214d6f2dabd67",
+                "reference": "3e3f2640776853abc1ab54cac3f214d6f2dabd67",
                 "shasum": ""
             },
             "require-dev": {
@@ -331,7 +331,7 @@
                 "MIT"
             ],
             "description": "The neural network (NN) written by PHP.",
-            "time": "2016-09-15 11:30:56"
+            "time": "2016-09-22 04:19:44"
         },
         {
             "name": "react/event-loop",
