@@ -8,70 +8,61 @@ $dimmension = 7;
 
 $field = new Field($dimmension);
 
-$white = new Niisan\Gomoku\libs\Agent();
-$black = new Niisan\Gomoku\libs\Agent();
+$agent = new Niisan\Gomoku\libs\Agent();
 
 $dimm2 = $dimmension * $dimmension;
-$wdir = __DIR__ . '/dest/white';
-$bdir = __DIR__ . '/dest/black';
-$white->init($dimm2 + 1, $dimm2);
-$black->init($dimm2 + 1, $dimm2);
-for ($i = 1; $i < 500000; $i++) {
-    $state = $field->getState(true);
+$dir = __DIR__ . '/dest/agent';
+$agent->init($dimm2 + 1, $dimm2);
+for ($i = 1; $i < 50000; $i++) {
     $actions = $field->getProb();
-    if ($field->getTurn() === 1) {
-        $obj = $white;
-    } else {
-        $obj = $black;
+    $keys = array_rand($actions, mt_rand(2, 7));
+    foreach ($keys as $key) {
+        $field->agentPut($actions[$key]);
     }
 
-    $action = $obj->train($state, $actions);
-    $field->agentPut($action);
-    if (!empty($field->message)) {
-        print_r($field->message);
-        print_r($actions);
-        print_r($action);
-        print_r($field->getState());
-        exit;
-    }
+    while (true) {
+        $state = $field->getState(true);
+        $actions = $field->getProb();
 
-    if ($field->isEnd()) {
-        $winner = $field->getWinner();
-        if ($winner == 1) {
-            $white->setReward(2);
-            $black->setReward(-2);
-            //echo "白の勝ち\n";
-        } elseif ($winner == -1) {
-            $white->setReward(-2);
-            $black->setReward(2);
-            //echo "黒の勝ち\n";
-        } else {
-            $white->setReward(1);
-            $black->setReward(1.5);
-            //echo "引き分け\n";
+        $action = $agent->train($state, $actions);
+        $field->agentPut($action);
+        if (!empty($field->message)) {
+            print_r($field->message);
+            print_r($actions);
+            print_r($action);
+            print_r($field->getState());
+            exit;
         }
 
-        //show($field, $dimmension);
-        //sleep(1);
-        $white->reset();
-        $black->reset();
-        $field->initialize();
-        continue;
-    }
+        if ($field->isEnd()) {
+            $winner = $field->getWinner();
+            if ($winner == 1) {
+                $agent->setReward(2, -2);
+                //echo "白の勝ち\n";
+            } elseif ($winner == -1) {
+                $agent->setReward(-2, 2);
+                //echo "黒の勝ち\n";
+            } else {
+                $agent->setReward(1, 1.5);
+                //echo "引き分け\n";
+            }
 
-    // $rewards = $field->getReward();
-    // $reward = 0;
-    // foreach($rewards as $val) {
-    //     $reward += $val;
-    // }
+            //show($field, $dimmension);
+            //sleep(1);
+            $agent->reset();
+            $field->initialize();
+            continue 2;
+        }
 
-    if ($reward > 0) {
-        $obj->setReward($reward);
+        // $rewards = $field->getReward();
+        // $reward = 0;
+        // foreach($rewards as $val) {
+        //     $reward += $val;
+        // }
     }
 }
 
-$white->saveModel($wdir, $dimmension);
-$black->saveModel($bdir, $dimmension);
+$agent->saveModel($dir, $dimmension);
 
 
 function show($game, $dim)

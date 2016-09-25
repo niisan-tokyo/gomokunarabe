@@ -8,24 +8,20 @@ $dimension = 7;
 
 $field = new Field($dimension);
 
-$white = new Niisan\Gomoku\libs\Agent();
-$black = new Niisan\Gomoku\libs\Agent();
+$obj = new Niisan\Gomoku\libs\Agent();
 
 $display = new Niisan\Gomoku\libs\Display;
 $display->dim = $dimension;
 
 $dimm2 = $dimension * $dimension;
-$wdir = __DIR__ . '/dest/white';
-$bdir = __DIR__ . '/dest/black';
-$white->init($dimm2, $dimm2);
-$black->init($dimm2, $dimm2);
+$dir = __DIR__ . '/dest/agent';
+$obj->init($dimm2 + 1, $dimm2);
 
-$white->loadModel($wdir, $dimension);
-$black->loadModel($bdir, $dimension);
+$obj->loadModel($dir, $dimension);
 
 $display->show($field);
-$your_turn = 1;
-$obj = ($your_turn === 1) ? $black: $white;
+$your_turn = -1;
+
 while(1) {
     $state = $field->getState(true);
     $actions = $field->getProb();
@@ -35,8 +31,7 @@ while(1) {
             echo $firld->message . "\n";
         }
     } else {
-        $obj->input($state);
-        $action = $obj->getAction($actions);
+        $action = $obj->getAction($state, $actions);
         $field->agentPut($action);
     }
 

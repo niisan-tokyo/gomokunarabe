@@ -13,22 +13,20 @@ class Agent
     private $output_dim;
     private $layer = [];
     private $layer_dim = [
-        1 => 32,
-        2 => 64,
-        3 => 128,
-        4 => 64,
-        5 => 32
+        1 => 64,
+        2 => 128,
+        3 => 64,
     ];
-    private $layer_count = 6;
-    private $action_count = 7;
-    private $pass_effect  = 0.9;
+    private $layer_count = 4;
+    private $action_count = 10;
+    private $pass_effect  = 0.95;
 
     private $value_function;
     private $action;
 
     // e-greedy
     private $max_epsilon = 200000;
-    private $min_epsilon = 40000;
+    private $min_epsilon = 10000;
     private $epock = 0;
     private $epock_line = 50000;
     private $epsilon;
@@ -50,7 +48,7 @@ class Agent
             $obj->init(
                 $this->layer_dim[$i - 1],
                 $this->layer_dim[$i],
-                ['history_count' => $this->action_count, 'effect' => 0.04]
+                ['history_count' => $this->action_count, 'effect' => 0.001]
             );
             $this->layer[$i] = $obj;
         }
@@ -58,7 +56,7 @@ class Agent
         $obj->init(
             $this->layer_dim[$this->layer_count - 1],
             $this->layer_dim[$this->layer_count],
-            ['history_count' => $this->action_count, 'effect' => 0.04, 'max' => 2]
+            ['history_count' => $this->action_count, 'effect' => 0.1, 'max' => 2]
         );
         $this->layer[$this->layer_count] = $obj;
         $this->epsilon = $this->max_epsilon + 1;
@@ -130,33 +128,34 @@ class Agent
     }
 
 
-    public function setReward($reward)
+    public function setReward($reward_white, $reward_black)
     {
-        //echo "reward: $reward \n";
-        $loss_diff = array_fill(0, $this->output_dim, 0);
-
         $action_count = count($this->action);
-        $action = $this->action[$action_count - 1];
-        $value = $this->value_function[$action];
-        //echo "$value \n";
-        if ($this->reward_count % 50 == 0) {
-            $loss = ($value - $reward) * ($value - $reward) / 2;
-            echo "epock: $this->epock , loss: $loss \n";
-        }
-        $loss_diff_val = $value - $reward;
-        $loss_diff[$action] = $loss_diff_val;
+        $rewards = [1 => $reward_white, -1 => $reward_black];
+
         for ($i = 0; $i < $action_count; $i++) {
-            $this->input($this->states_history[$action_count - $i - 1]);
+            $states = $this->states_history[$action_count - $i - 1];
+            $action = $this->action[$action_count - $i - 1];
+            $this->input($states);
+            $value = $this->value_function[$action];
+            $loss_diff_val = $value - $rewards[$states[0]];
+            $loss_diff = array_fill(0, $this->output_dim, 0);
+            $loss_diff[$action] = $loss_diff_val;
+
+            if ($this->reward_count % 50 == 0 && $i < 2) {
+                $reward = $rewards[$states[0]];
+                $state = $states[0];
+                $loss = ($value - $reward) * ($value - $reward) / 2;
+                echo "epock: $this->epock , loss: $loss , reward: $reward , state: $state \n";
+            }
+
             $res = $loss_diff;
             for ($j = $this->layer_count; $j > 0; $j--) {
                 $res = $this->layer[$j]->backProp($res);
             }
-
-            $action = $this->action[$action_count - $i - 2];
-            $loss_diff = array_fill(0, $this->output_dim, 0);
-            $loss_diff_val = $this->pass_effect * $loss_diff_val;
-            $loss_diff[$action] = $loss_diff_val;
+            $rewards[$states[0]] = $this->pass_effect * $rewards[$states[0]];
         }
+
         $this->reward_count++;
     }
 
@@ -188,7 +187,7 @@ class Agent
 
     private function getFilename($dir, $dim, $layer)
     {
-        $file = 'bdim_' . $dim . '_layer_' . $layer . '.txt';
+        $file = 'sdim_' . $dim . '_layer_' . $layer . '.txt';
         return $dir . '/' . $file;
     }
 
